@@ -5,10 +5,10 @@ from datetime import datetime, timedelta
 # -----------------------------
 # API KEYS (replace placeholders)
 # -----------------------------
-NEWSAPI_KEY = "YOUR_NEWSAPI_KEY"
-FINNHUB_KEY = "YOUR_FINNHUB_KEY"
-MARKETAUX_KEY = "YOUR_MARKETAUX_KEY"
-ALPHAVANTAGE_KEY = "YOUR_ALPHA_KEY"
+NEWSAPI_KEY = "8ba145b0434342d0b6fd7ae32a4ea0c8"
+FINNHUB_KEY = "d5n0fb9r01qj2afii6pgd5n0fb9r01qj2afii6q0"
+MARKETAUX_KEY = "syf8Is3MD7bwkQRihpo9p0z8Hb70GmVL8qEmsAhg"
+ALPHAVANTAGE_KEY = "Z0QQ8PAUM5E999U6"
 
 
 # -----------------------------

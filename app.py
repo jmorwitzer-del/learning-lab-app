@@ -157,3 +157,4 @@ elif section == "Learning":
     """)
 
     st.info("Learning modules will be added shortly.")
+

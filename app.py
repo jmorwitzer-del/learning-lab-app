@@ -148,13 +148,15 @@ elif section == "Journal":
 elif section == "Learning":
     st.title("📚 Learning Center")
 
-    st.markdown("""
-    This section will include:
-    - Definitions  
-    - Examples  
-    - Routines  
-    - Father–son guided prompts  
-    """)
+    from utils.learning import load_learning_items
 
-    st.info("Learning modules will be added shortly.")
+    items = load_learning_items()
+
+    search = st.text_input("Search topics")
+
+    for item in items:
+        if search and search.lower() not in item["title"].lower():
+            continue
+        with st.expander(item["title"]):
+            st.write(item["content"])
 

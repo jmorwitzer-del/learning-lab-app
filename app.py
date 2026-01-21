@@ -115,11 +115,32 @@ elif section == "News":
 elif section == "Journal":
     st.title("📝 Journal")
 
-    st.write("Record your thoughts, insights, and observations.")
+    from utils.journal import load_journal, save_entry
 
-    entry = st.text_area("New entry")
+    st.subheader("New Entry")
+    entry = st.text_area("Write your thoughts here")
+
     if st.button("Save Entry"):
-        st.success("Entry saved (persistence will be added soon).")
+        if entry.strip():
+            save_entry(entry)
+            st.success("Entry saved.")
+        else:
+            st.warning("Cannot save an empty entry.")
+
+    st.subheader("Previous Entries")
+    df = load_journal()
+
+    if df.empty:
+        st.info("No journal entries yet.")
+    else:
+        search = st.text_input("Search entries")
+        if search:
+            df = df[df["entry"].str.contains(search, case=False, na=False)]
+
+        for _, row in df.sort_values("timestamp", ascending=False).iterrows():
+            with st.expander(f"{row['timestamp']}"):
+                st.write(row["entry"])
+
 
 # ---------------------------------------------------------
 # LEARNING CENTER

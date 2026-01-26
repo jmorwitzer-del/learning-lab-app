@@ -1,4 +1,7 @@
 from utils.alpha_live import live_divergence_signal
+import streamlit as st
+from utils.alpha_live import live_divergence_signal
+from utils.alpha_history import fetch_history
 
 st.header("📡 Live ES + VIX Divergence Signal")
 

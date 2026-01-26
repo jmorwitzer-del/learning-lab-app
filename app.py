@@ -1,163 +1,34 @@
 import streamlit as st
 import pandas as pd
-import yfinance as yf
+from utils.learning import run_es_vix_engine
 
-# ---------------------------------------------------------
-# APP CONFIG
-# ---------------------------------------------------------
-st.set_page_config(
-    page_title="Learning Lab",
-    page_icon="📈",
-    layout="wide"
-)
+st.title("Learning Lab — ES+VIX Divergence Engine")
 
-# ---------------------------------------------------------
-# SIDEBAR NAVIGATION
-# ---------------------------------------------------------
-st.sidebar.title("📘 Learning Lab")
-section = st.sidebar.radio(
-    "Navigation",
-    ["Dashboard", "Market Data", "Indicators", "News", "Journal", "Learning"]
-)
+st.write("Upload ES and VIX CSV files to run the engine.")
 
-# ---------------------------------------------------------
-# HELPER: LOAD DATA
-# ---------------------------------------------------------
-@st.cache_data
-def load_price_data(ticker, period="1y", interval="1d"):
-    try:
-        data = yf.download(ticker, period=period, interval=interval)
-        if data.empty:
-            return None
-        return data
-    except Exception:
-        return None
+es_file = st.file_uploader("Upload ES CSV", type="csv")
+vix_file = st.file_uploader("Upload VIX CSV", type="csv")
 
-# ---------------------------------------------------------
-# DASHBOARD
-# ---------------------------------------------------------
-if section == "Dashboard":
-    st.title("📈 Learning Lab Dashboard")
-    st.write("Welcome to your personal market learning environment.")
+if es_file and vix_file:
+    es_df = pd.read_csv(es_file, parse_dates=['Date'])
+    vix_df = pd.read_csv(vix_file, parse_dates=['Date'])
 
-    st.subheader("Quick Start")
-    st.markdown("""
-    - Choose **Market Data** to view charts  
-    - Choose **Indicators** to explore technical tools  
-    - Choose **News** for market context  
-    - Choose **Journal** to record insights  
-    - Choose **Learning** for definitions and routines  
-    """)
+    monthly, stats, full_data = run_es_vix_engine(es_df, vix_df)
 
-# ---------------------------------------------------------
-# MARKET DATA
-# ---------------------------------------------------------
-elif section == "Market Data":
-    st.title("📊 Market Data")
+    st.subheader("Monthly P&L Summary")
+    st.dataframe(monthly)
 
-    ticker = st.text_input("Enter a ticker symbol", "AAPL")
-    period = st.selectbox("Period", ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y"])
-    interval = st.selectbox("Interval", ["1m", "5m", "15m", "1h", "1d", "1wk"])
+    st.subheader("Stats")
+    for k, v in stats.items():
+        st.write(f"{k}: {v}")
 
-    data = load_price_data(ticker, period, interval)
+    st.subheader("Trade Log")
+    st.dataframe(full_data[['Date','signal','ES_move','VIX_move','ATR14','vix_regime','size_mult','PnL_MES']])
 
-    if data is None:
-        st.error("No data found. Try another ticker.")
-    else:
-        st.line_chart(data["Close"])
-        st.dataframe(data.tail())
-
-# ---------------------------------------------------------
-# INDICATORS (placeholder until utils/indicators.py is added)
-# ---------------------------------------------------------
-elif section == "Indicators":
-    st.title("📐 Indicators")
-    st.info("Technical indicators will appear here once indicator utilities are added.")
-
-# ---------------------------------------------------------
-# NEWS (placeholder until utils/news.py is added)
-# ---------------------------------------------------------
-elif section == "News":
-    st.title("📰 Market News")
-
-    from utils.news import get_news, fetch_price_reaction
-
-    query = st.text_input("Search ticker or keyword", "AAPL")
-
-    if query:
-        st.subheader(f"Latest news for: {query}")
-
-        df = get_news(query)
-
-        if df.empty:
-            st.warning("No news found.")
-        else:
-            for _, row in df.iterrows():
-                with st.expander(f"{row['title']}"):
-                    st.write(f"**Source:** {row['source']}")
-                    st.write(f"**Published:** {row['published']}")
-                    if row["sentiment"] is not None:
-                        st.write(f"**Sentiment:** {row['sentiment']:.2f}")
-                    st.write(f"[Read article]({row['url']})")
-
-            st.subheader("📈 Price Reaction (AlphaVantage)")
-            price = fetch_price_reaction(query)
-
-            if price is not None:
-                st.line_chart(price["close"])
-            else:
-                st.info("No price data available.")
-
-
-# ---------------------------------------------------------
-# JOURNAL (CSV persistence added later)
-# ---------------------------------------------------------
-elif section == "Journal":
-    st.title("📝 Journal")
-
-    from utils.journal import load_journal, save_entry
-
-    st.subheader("New Entry")
-    entry = st.text_area("Write your thoughts here")
-
-    if st.button("Save Entry"):
-        if entry.strip():
-            save_entry(entry)
-            st.success("Entry saved.")
-        else:
-            st.warning("Cannot save an empty entry.")
-
-    st.subheader("Previous Entries")
-    df = load_journal()
-
-    if df.empty:
-        st.info("No journal entries yet.")
-    else:
-        search = st.text_input("Search entries")
-        if search:
-            df = df[df["entry"].str.contains(search, case=False, na=False)]
-
-        for _, row in df.sort_values("timestamp", ascending=False).iterrows():
-            with st.expander(f"{row['timestamp']}"):
-                st.write(row["entry"])
-
-
-
-# ---------------------------------------------------------
-# LEARNING CENTER
-# ---------------------------------------------------------
-elif section == "Learning":
-    st.title("📚 Learning Center")
-
-    from utils.learning import load_learning_items
-
-    items = load_learning_items()
-
-    search = st.text_input("Search topics")
-
-    for item in items:
-        if search and search.lower() not in item["title"].lower():
-            continue
-        with st.expander(item["title"]):
-            st.write(item["content"])
+with st.sidebar:
+    st.header("Learning Lab Modules")
+    st.markdown("[Model Comparison](lab_modules/es_vix_model_comparison.md)")
+    st.markdown("[HFT Concepts](lab_modules/hft_concepts.md)")
+    st.markdown("[Father–Son Prompts](lab_modules/father_son_prompts.md)")
+    st.markdown("[Probability Engine Notes](lab_modules/probability_engine_notes.md)")
 

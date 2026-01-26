@@ -7,6 +7,7 @@ from utils.alpha_history import fetch_history
 from utils.yahoo_data import fetch_intraday   # 
 
 
+
 # ---------------------------------------------------------
 # LIVE SIGNAL SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------

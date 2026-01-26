@@ -3,29 +3,24 @@ import pandas as pd
 
 from utils.learning import run_es_vix_engine
 from utils.alpha_live import live_divergence_signal
+from utils.alpha_history import fetch_history
 
 st.set_page_config(page_title="Learning Lab", layout="wide")
 
 st.title("📈 Learning Lab — ES+VIX Divergence Engine")
 
 # ---------------------------------------------------------
-# CREATE ALL THREE TABS
+# CREATE TWO TABS (NO CSV UPLOADS)
 # ---------------------------------------------------------
-tab1, tab2 = st.tabs([
-    "Live Signals",
-    "Historical Auto‑Fetch"
-])
-
+tab1, tab2 = st.tabs(
+    [
+        "Live Signals",
+        "Historical Auto‑Fetch"
     ]
 )
-# ---------------------------------------------------------
-# TAB 1 — CSV BACKTEST
-# ---------------------------------------------------------
-
-
 
 # ---------------------------------------------------------
-# TAB 2 — LIVE SIGNALS
+# TAB 1 — LIVE SIGNALS
 # ---------------------------------------------------------
 with tab1:
     st.subheader("Live ES/VIX Divergence Signal (via Alpha Vantage)")
@@ -33,7 +28,7 @@ with tab1:
     st.caption("Uses SPY as ES proxy and VIX from Alpha Vantage. Refresh to update.")
 
     if st.button("Refresh live data"):
-        pass
+        pass  # Streamlit reruns the script automatically
 
     live = live_divergence_signal()
 
@@ -55,9 +50,8 @@ with tab1:
         else:
             st.info("No clean divergence signal right now.")
 
-
 # ---------------------------------------------------------
-# TAB 3 — HISTORICAL AUTO‑FETCH
+# TAB 2 — HISTORICAL AUTO‑FETCH
 # ---------------------------------------------------------
 with tab2:
     st.subheader("Automated Historical Backtest (No Uploads)")
@@ -66,8 +60,6 @@ with tab2:
     end = st.date_input("End date")
 
     if st.button("Run historical backtest"):
-        from utils.alpha_history import fetch_history
-
         es_df, vix_df = fetch_history(start, end)
 
         if es_df is None or vix_df is None or es_df.empty or vix_df.empty:
@@ -100,4 +92,3 @@ with tab2:
                     ]
                 ]
             )
-

@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+
 from utils.learning import run_es_vix_engine
 from utils.alpha_live import live_divergence_signal
 
@@ -7,43 +8,19 @@ st.set_page_config(page_title="Learning Lab", layout="wide")
 
 st.title("📈 Learning Lab — ES+VIX Divergence Engine")
 
-
-])
 # ---------------------------------------------------------
-# CREATE ALL THREE TABS HERE — BEFORE USING tab1/tab2/tab3
+# CREATE ALL THREE TABS
 # ---------------------------------------------------------
-tab1, tab2, tab3 = st.tabs([
-    "Backtest (CSV)",
-    "Live Signals (Alpha Vantage)",
-    "Historical Auto‑Fetch"
-])
-
+tab1, tab2, tab3 = st.tabs(
+    [
+        "Backtest (CSV)",
+        "Live Signals (Alpha Vantage)",
+        "Historical Auto‑Fetch"
+    ]
+)
 # ---------------------------------------------------------
-# TAB 1
+# TAB 1 — CSV BACKTEST
 # ---------------------------------------------------------
-with tab1:
-    st.subheader("Backtest with ES & VIX CSVs")
-    # ... your CSV code ...
-
-# ---------------------------------------------------------
-# TAB 2
-# ---------------------------------------------------------
-with tab2:
-    st.subheader("Live ES/VIX Divergence Signal (via Alpha Vantage)")
-    # ... your live signal code ...
-
-# ---------------------------------------------------------
-# TAB 3
-# ---------------------------------------------------------
-with tab3:
-    st.subheader("Automated Historical Backtest (No Uploads)")
-    # ... your historical fetch code ...
-
-])
-with tab1: # backtest code... with tab2: # live signals code... with tab3: # historical auto-fetch code...
-# -----------------------------
-# TAB 1: BACKTEST (CSV UPLOAD) 
-# -----------------------------
 with tab1:
     st.subheader("Backtest with ES & VIX CSVs")
 
@@ -84,16 +61,17 @@ with tab1:
     else:
         st.info("Upload both ES and VIX CSV files to run the backtest.")
 
-# -----------------------------
-# TAB 2: LIVE SIGNALS (ALPHA VANTAGE)
-# -----------------------------
+
+# ---------------------------------------------------------
+# TAB 2 — LIVE SIGNALS
+# ---------------------------------------------------------
 with tab2:
     st.subheader("Live ES/VIX Divergence Signal (via Alpha Vantage)")
 
     st.caption("Uses SPY as ES proxy and VIX from Alpha Vantage. Refresh to update.")
 
     if st.button("Refresh live data"):
-        pass  # Streamlit reruns the script on button press
+        pass
 
     live = live_divergence_signal()
 
@@ -115,18 +93,10 @@ with tab2:
         else:
             st.info("No clean divergence signal right now.")
 
-# -----------------------------
-# SIDEBAR MODULES
-# -----------------------------
-with st.sidebar:
-    st.header("📚 Learning Lab Modules")
-    st.markdown("[ES+VIX Model Comparison](lab_modules/es_vix_model_comparison.md)")
-    st.markdown("[HFT Concepts](lab_modules/hft_concepts.md)")
-    st.markdown("[Father–Son Prompts](lab_modules/father_son_prompts.md)")
-    st.markdown("[Probability Engine Notes](lab_modules/probability_engine_notes.md)")
-    # -----------------------------
-# TAB 3: HISTORICAL AUTO-FETCH
-# -----------------------------
+
+# ---------------------------------------------------------
+# TAB 3 — HISTORICAL AUTO‑FETCH
+# ---------------------------------------------------------
 with tab3:
     st.subheader("Automated Historical Backtest (No Uploads)")
 

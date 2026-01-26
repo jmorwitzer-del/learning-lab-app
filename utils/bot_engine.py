@@ -15,6 +15,17 @@ class BotEngine:
     """
 
     def __init__(self):
+            def set_broker(self, broker_name):
+        """Assign a broker connector (simulation mode)."""
+        if broker_name == "Interactive Brokers (IBKR)":
+            from utils.brokers.ibkr import IBKRBroker
+            self.broker = IBKRBroker()
+        elif broker_name == "Alpaca":
+            from utils.brokers.alpaca import AlpacaBroker
+            self.broker = AlpacaBroker()
+        else:
+            self.broker = None
+
         self.position = None        # "LONG", "SHORT", or None
         self.last_trade = None      # record of last executed trade
         self.log = []               # list of trade logs

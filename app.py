@@ -71,7 +71,8 @@ from utils.alpha_history import fetch_history
 st.header("📅 Backtest ES + VIX Divergence Strategy")
 
 # --- UI ---
-start_date = st.date_input("Start date")
+start_date = st.date_input("Start date", key="bt_start_2")
+
 end_date = st.date_input("End date")
 
 if st.button("Run Backtest"):

@@ -7,10 +7,7 @@ st.set_page_config(page_title="Learning Lab", layout="wide")
 
 st.title("📈 Learning Lab — ES+VIX Divergence Engine")
 
-tab1, tab2, tab3 = st.tabs([
-    "Backtest (CSV)",
-    "Live Signals (Alpha Vantage)",
-    "Historical Auto‑Fetch"
+
 ])
 # ---------------------------------------------------------
 # CREATE ALL THREE TABS HERE — BEFORE USING tab1/tab2/tab3

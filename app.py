@@ -24,6 +24,77 @@ else:
     st.write(f"VIX move: {live['vix_move']:.2f}")
     st.write(f"SPY close: {live['spy_close']:.2f}")
     st.write(f"VIX close: {live['vix_close']:.2f}")
+# ---------------------------------------------------------
+# LIVE MARKET DASHBOARD (Stage 3)
+# ---------------------------------------------------------
+
+st.header("📊 Live Market Dashboard")
+
+live = live_divergence_signal()
+
+if live is None:
+    st.info("Waiting for intraday data… market may be closed or data not yet available.")
+else:
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("SPY Move (1m)", f"{live['es_move']:.4f}")
+
+    with col2:
+        st.metric("VIX Move (1m)", f"{live['vix_move']:.4f}")
+
+    with col3:
+        st.metric("Current Signal", live["signal"])
+
+    st.write("---")
+
+    # Signal preview if market closed now
+    es_pct = (live["es_move"] / live["spy_close"]) * 100
+    vix_pct = (live["vix_move"] / live["vix_close"]) * 100
+
+    if es_pct > 0.05 and vix_pct < -0.05:
+        preview = "LONG"
+    elif es_pct < -0.05 and vix_pct > 0.05:
+        preview = "SHORT"
+    else:
+        preview = "NONE"
+
+    st.subheader("📌 If the market closed right now…")
+    st.success(f"Tomorrow's signal would be: **{preview}**")
+
+    st.write("---")
+
+    # Live charts (SPY + VIX intraday)
+    st.subheader("📈 Live SPY & VIX Charts")
+
+    try:
+        spy_live = fetch_intraday("SPY", period="1d", interval="1m")
+        vix_live = fetch_intraday("^VIX", period="1d", interval="1m")
+
+        if spy_live is not None:
+            st.line_chart(spy_live["Close"], height=200)
+
+        if vix_live is not None:
+            st.line_chart(vix_live["Close"], height=200)
+
+    except Exception as e:
+        st.warning(f"Could not load live charts: {e}")
+
+    st.write("---")
+
+    # Sentiment gauge
+    st.subheader("🧭 Market Sentiment Gauge")
+
+    vix_level = live["vix_close"]
+
+    if vix_level < 15:
+        sentiment = "Low Fear (Bullish Bias)"
+    elif vix_level < 25:
+        sentiment = "Normal Volatility"
+    else:
+        sentiment = "High Fear (Bearish Bias)"
+
+    st.info(f"VIX Level: **{vix_level:.2f}** → {sentiment}")
 
 # ---------------------------------------------------------
 # ---------------------------------------------------------

@@ -116,11 +116,11 @@ bot = st.session_state.bot
 enable_bot = st.checkbox("Enable automated trading (simulation mode)")
 
 broker = st.selectbox(
-    bot.set_broker(broker)
-
     "Select broker (architecture only at this stage)",
     ["Interactive Brokers (IBKR)", "Alpaca", "None"]
 )
+
+bot.set_broker(broker)
 
 if enable_bot:
     st.success("Automation enabled (simulation mode).")
@@ -146,13 +146,13 @@ with col_a:
     if st.button("Simulate Market OPEN Check"):
         if enable_bot and live:
             if bot.should_enter(live["signal"]):
-                bot.enter_trade(live["signal"])
+                bot.enter_trade(live["signal"], price=live["spy_close"])
 
 with col_b:
     if st.button("Simulate Market CLOSE Check"):
-        if enable_bot:
+        if enable_bot and live:
             if bot.should_exit():
-                bot.exit_trade()
+                bot.exit_trade(price=live["spy_close"])
 
 # Bot status
 status = bot.get_status()
@@ -334,7 +334,5 @@ if st.button("Run Backtest", key="bt_run"):
             st.subheader("⬇️ Download Results")
             csv = trades_df.to_csv(index=False)
             st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
-
-
 
 

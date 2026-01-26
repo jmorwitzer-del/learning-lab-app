@@ -72,8 +72,8 @@ st.header("📅 Backtest ES + VIX Divergence Strategy")
 
 # --- UI ---
 start_date = st.date_input("Start date", key="bt_start_2")
+end_date = st.date_input("End date", key="bt_end_2")
 
-end_date = st.date_input("End date")
 
 if st.button("Run Backtest"):
     if start_date >= end_date:

@@ -52,6 +52,12 @@ if st.button("Run Backtest", key="bt_run"):
             df = pd.merge(spy, vix, on="Date", suffixes=("_SPY", "_VIX"))
             df = df.sort_values("Date").reset_index(drop=True)
 
+            # FIX: Flatten MultiIndex columns from Yahoo Finance
+            df.columns = [
+                f"{col[0]}{col[1]}" if isinstance(col, tuple) else col
+                for col in df.columns
+            ]
+
             # Divergence logic on daily bars
             df["ES_move"] = df["Close_SPY"] - df["Open_SPY"]
             df["VIX_move"] = df["Close_VIX"] - df["Open_VIX"]

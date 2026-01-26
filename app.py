@@ -92,3 +92,48 @@ with st.sidebar:
     st.markdown("[HFT Concepts](lab_modules/hft_concepts.md)")
     st.markdown("[Father–Son Prompts](lab_modules/father_son_prompts.md)")
     st.markdown("[Probability Engine Notes](lab_modules/probability_engine_notes.md)")
+    # -----------------------------
+# TAB 3: HISTORICAL AUTO-FETCH
+# -----------------------------
+with tab3:
+    st.subheader("Automated Historical Backtest (No Uploads)")
+
+    start = st.date_input("Start date")
+    end = st.date_input("End date")
+
+    if st.button("Run historical backtest"):
+        from utils.alpha_history import fetch_history
+
+        es_df, vix_df = fetch_history(start, end)
+
+        if es_df is None or vix_df is None or es_df.empty or vix_df.empty:
+            st.error("Could not fetch historical data. Check API key or date range.")
+        else:
+            monthly, stats, full_data = run_es_vix_engine(es_df, vix_df)
+
+            st.markdown("### 📅 Monthly P&L Summary")
+            st.dataframe(monthly)
+
+            st.markdown("### 📊 Stats")
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("Trades", stats["Trades"])
+            col2.metric("Wins", stats["Wins"])
+            col3.metric("Losses", stats["Losses"])
+            col4.metric("Win Rate (%)", stats["Win Rate (%)"])
+
+            st.markdown("### 📝 Trade Log")
+            st.dataframe(
+                full_data[
+                    [
+                        "Date",
+                        "signal",
+                        "ES_move",
+                        "VIX_move",
+                        "ATR14",
+                        "vix_regime",
+                        "size_mult",
+                        "PnL_MES",
+                    ]
+                ]
+            )
+

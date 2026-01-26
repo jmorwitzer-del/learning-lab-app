@@ -5,13 +5,6 @@ import pandas as pd
 API_KEY = os.getenv("POLYGON_API_KEY")
 BASE_URL = "https://api.polygon.io/v2/aggs/ticker"
 
-import os
-import requests
-import pandas as pd
-
-API_KEY = os.getenv("POLYGON_API_KEY")
-BASE_URL = "https://api.polygon.io/v2/aggs/ticker"
-
 def fetch_intraday(symbol, timespan="minute", limit=2):
     url = f"{BASE_URL}/{symbol}/range/1/{timespan}/now"
     params = {"apiKey": API_KEY, "limit": limit}
@@ -39,6 +32,7 @@ def fetch_intraday(symbol, timespan="minute", limit=2):
         "v": "Volume"
     })
     return df.sort_values("Date")
+
 
 
 def fetch_daily(symbol, start, end):

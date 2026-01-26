@@ -26,6 +26,7 @@ else:
     st.write(f"VIX close: {live['vix_close']:.2f}")
 
 # ---------------------------------------------------------
+# ---------------------------------------------------------
 # BACKTEST SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------
 
@@ -52,11 +53,22 @@ if st.button("Run Backtest", key="bt_run"):
             df = pd.merge(spy, vix, on="Date", suffixes=("_SPY", "_VIX"))
             df = df.sort_values("Date").reset_index(drop=True)
 
-            # FIX: Flatten MultiIndex columns from Yahoo Finance
+            # Flatten MultiIndex columns from Yahoo Finance
             df.columns = [
                 f"{col[0]}{col[1]}" if isinstance(col, tuple) else col
                 for col in df.columns
             ]
+
+            # DEBUG: Show actual columns so we know what Yahoo returned
+            st.write("🔍 Columns returned by Yahoo Finance:", list(df.columns))
+
+            # Ensure expected columns exist
+            required_cols = ["Open_SPY", "Close_SPY", "Open_VIX", "Close_VIX"]
+            missing = [c for c in required_cols if c not in df.columns]
+
+            if missing:
+                st.error(f"Missing expected columns: {missing}")
+                st.stop()
 
             # Divergence logic on daily bars
             df["ES_move"] = df["Close_SPY"] - df["Open_SPY"]
@@ -110,6 +122,11 @@ if st.button("Run Backtest", key="bt_run"):
             st.subheader("📉 Equity Curve")
             if len(trades_df) > 0:
                 st.line_chart(trades_df.set_index("Date")["Equity"])
+
+            # CSV Export
+            st.subheader("⬇️ Download Results")
+            csv = trades_df.to_csv(index=False)
+            st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
 
             # CSV Export
             st.subheader("⬇️ Download Results")

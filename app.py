@@ -18,8 +18,10 @@ else:
     st.header("📅 Backtest ES + VIX Divergence")
     st.header("📅 Backtest ES + VIX Divergence")
 
-start_date = st.date_input("Start date")
-end_date = st.date_input("End date")
+start_date = st.date_input("Start date", key="backtest_start")
+end_date = st.date_input("End date", key="backtest_end")
+
+
 
 if st.button("Run Backtest"):
     if start_date >= end_date:

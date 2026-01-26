@@ -24,6 +24,7 @@ else:
     st.write(f"VIX move: {live['vix_move']:.2f}")
     st.write(f"SPY close: {live['spy_close']:.2f}")
     st.write(f"VIX close: {live['vix_close']:.2f}")
+
 # ---------------------------------------------------------
 # BACKTEST SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------
@@ -137,6 +138,39 @@ if st.button("Run Backtest", key="bt_run"):
             st.subheader("📉 Equity Curve")
             if len(trades_df) > 0:
                 st.line_chart(trades_df.set_index("Date")["Equity"])
+
+            # 📊 Strategy Analytics (Stage 1)
+            if len(trades_df) > 0:
+                trades_df["Return"] = trades_df["PnL"] / position_size
+
+                total_return = (equity / 10000) - 1
+                wins = trades_df[trades_df["PnL"] > 0]
+                losses = trades_df[trades_df["PnL"] < 0]
+
+                win_rate = len(wins) / len(trades_df) if len(trades_df) > 0 else 0
+                avg_win = wins["PnL"].mean() if len(wins) > 0 else 0
+                avg_loss = losses["PnL"].mean() if len(losses) > 0 else 0
+
+                expectancy = win_rate * avg_win + (1 - win_rate) * avg_loss
+
+                equity_curve = trades_df["Equity"]
+                running_max = equity_curve.cummax()
+                drawdown = (equity_curve - running_max) / running_max
+                max_drawdown = drawdown.min()
+
+                if trades_df["Return"].std() != 0:
+                    sharpe = (trades_df["Return"].mean() / trades_df["Return"].std()) * np.sqrt(252)
+                else:
+                    sharpe = 0.0
+
+                st.subheader("📊 Strategy Stats")
+                st.write(f"**Total Return:** {total_return:.2%}")
+                st.write(f"**Win Rate:** {win_rate:.2%}")
+                st.write(f"**Average Win:** ${avg_win:,.2f}")
+                st.write(f"**Average Loss:** ${avg_loss:,.2f}")
+                st.write(f"**Expectancy per Trade:** ${expectancy:,.2f}")
+                st.write(f"**Max Drawdown:** {max_drawdown:.2%}")
+                st.write(f"**Sharpe Ratio (approx):** {sharpe:.2f}")
 
             # CSV Export
             st.subheader("⬇️ Download Results")

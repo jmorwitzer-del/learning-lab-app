@@ -10,23 +10,10 @@ def fetch_history(start: str, end: str):
     spy = fetch_daily("SPY", start, end)
     vix = fetch_daily("^VIX", start, end)
 
-    if spy is None or vix is None:
+    if spy is None or vix is None or spy.empty or vix.empty:
         return None, None
 
-    # Ensure Date is datetime.date in both
     spy["Date"] = pd.to_datetime(spy["Date"]).dt.date
     vix["Date"] = pd.to_datetime(vix["Date"]).dt.date
 
     return spy, vix
-
-from utils.polygon_data import fetch_daily
-
-def fetch_history(start, end):
-    spy = fetch_daily("SPY", start, end)
-    vix = fetch_daily("VIX", start, end)
-
-    if spy is None or vix is None:
-        return None, None
-
-    return spy, vix
-

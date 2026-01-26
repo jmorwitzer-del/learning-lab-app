@@ -6,7 +6,7 @@ from utils.alpha_live import live_divergence_signal
 from utils.alpha_history import fetch_history
 
 # ---------------------------------------------------------
-# LIVE SIGNAL SECTION
+# LIVE SIGNAL SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------
 
 st.header("📡 Live ES + VIX Divergence Signal")
@@ -14,7 +14,10 @@ st.header("📡 Live ES + VIX Divergence Signal")
 live = live_divergence_signal()
 
 if live is None:
-    st.info("No intraday candles available right now. This usually happens when the US market is closed or Polygon hasn't published the first minute bar yet.")
+    st.info(
+        "No intraday candles available right now. This usually happens when the US market is closed "
+        "or Yahoo Finance hasn't published the latest minute bars yet."
+    )
 else:
     st.success(f"Signal: {live['signal']}")
     st.write(f"SPY move: {live['es_move']:.2f}")
@@ -23,12 +26,11 @@ else:
     st.write(f"VIX close: {live['vix_close']:.2f}")
 
 # ---------------------------------------------------------
-# BACKTEST SECTION
+# BACKTEST SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------
 
 st.header("📅 Backtest ES + VIX Divergence Strategy")
 
-# Unique keys prevent duplicate widget errors
 start_date = st.date_input("Start date", key="bt_start")
 end_date = st.date_input("End date", key="bt_end")
 
@@ -41,16 +43,16 @@ if st.button("Run Backtest", key="bt_run"):
             end_date.strftime("%Y-%m-%d")
         )
 
-        if spy is None or vix is None:
-            st.warning("Polygon returned no historical data for the selected range.")
+        if spy is None or vix is None or spy.empty or vix.empty:
+            st.warning("Yahoo Finance returned no historical data for the selected range.")
         else:
             st.success("Historical data loaded successfully.")
 
-            # Merge datasets
+            # Merge on Date
             df = pd.merge(spy, vix, on="Date", suffixes=("_SPY", "_VIX"))
             df = df.sort_values("Date").reset_index(drop=True)
 
-            # Divergence logic
+            # Divergence logic on daily bars
             df["ES_move"] = df["Close_SPY"] - df["Open_SPY"]
             df["VIX_move"] = df["Close_VIX"] - df["Open_VIX"]
 
@@ -107,4 +109,3 @@ if st.button("Run Backtest", key="bt_run"):
             st.subheader("⬇️ Download Results")
             csv = trades_df.to_csv(index=False)
             st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
-

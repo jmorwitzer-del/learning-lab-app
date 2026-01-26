@@ -26,6 +26,7 @@ else:
     st.write(f"VIX close: {live['vix_close']:.2f}")
 
 # ---------------------------------------------------------
+# ---------------------------------------------------------
 # BACKTEST SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------
 
@@ -86,22 +87,25 @@ if st.button("Run Backtest", key="bt_run"):
                 st.error(f"Missing expected columns after renaming: {missing}")
                 st.stop()
 
+            # ---------------------------------------------------------
             # Divergence logic with aggressive thresholds (0.05%)
-df["ES_pct"] = (df["Close_SPY"] - df["Open_SPY"]) / df["Open_SPY"]
-df["VIX_pct"] = (df["Close_VIX"] - df["Open_VIX"]) / df["Open_VIX"]
+            # ---------------------------------------------------------
+            df["ES_pct"] = (df["Close_SPY"] - df["Open_SPY"]) / df["Open_SPY"]
+            df["VIX_pct"] = (df["Close_VIX"] - df["Open_VIX"]) / df["Open_VIX"]
 
-threshold = 0.0005  # 0.05%
+            threshold = 0.0005  # 0.05%
 
-df["Signal"] = np.where(
-    (df["ES_pct"] > threshold) & (df["VIX_pct"] < -threshold), "LONG",
-    np.where(
-        (df["ES_pct"] < -threshold) & (df["VIX_pct"] > threshold), "SHORT",
-        "NONE"
-    )
-)
+            df["Signal"] = np.where(
+                (df["ES_pct"] > threshold) & (df["VIX_pct"] < -threshold), "LONG",
+                np.where(
+                    (df["ES_pct"] < -threshold) & (df["VIX_pct"] > threshold), "SHORT",
+                    "NONE"
+                )
+            )
 
-
+            # ---------------------------------------------------------
             # Trade simulation
+            # ---------------------------------------------------------
             trades = []
             equity = 10000
             position_size = 10000
@@ -113,20 +117,22 @@ df["Signal"] = np.where(
                     ret = (row["Close_SPY"] - row["Open_SPY"]) / row["Open_SPY"]
                     pnl = position_size * ret
                     trades.append([row["Date"], "LONG", pnl])
+                    equity += pnl
 
                 elif row["Signal"] == "SHORT":
                     ret = (row["Open_SPY"] - row["Close_SPY"]) / row["Open_SPY"]
                     pnl = position_size * ret
                     trades.append([row["Date"], "SHORT", pnl])
-
-                equity += pnl
+                    equity += pnl
 
             trades_df = pd.DataFrame(trades, columns=["Date", "Side", "PnL"])
 
             if len(trades_df) > 0:
                 trades_df["Equity"] = 10000 + trades_df["PnL"].cumsum()
 
+            # ---------------------------------------------------------
             # Display results
+            # ---------------------------------------------------------
             st.subheader("📈 Trade Log")
             st.dataframe(trades_df)
 
@@ -137,7 +143,9 @@ df["Signal"] = np.where(
             if len(trades_df) > 0:
                 st.line_chart(trades_df.set_index("Date")["Equity"])
 
+            # ---------------------------------------------------------
             # 📊 Strategy Analytics (Stage 1)
+            # ---------------------------------------------------------
             if len(trades_df) > 0:
                 trades_df["Return"] = trades_df["PnL"] / position_size
 
@@ -170,9 +178,12 @@ df["Signal"] = np.where(
                 st.write(f"**Max Drawdown:** {max_drawdown:.2%}")
                 st.write(f"**Sharpe Ratio (approx):** {sharpe:.2f}")
 
+            # ---------------------------------------------------------
             # CSV Export
+            # ---------------------------------------------------------
             st.subheader("⬇️ Download Results")
             csv = trades_df.to_csv(index=False)
             st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
+
 
 

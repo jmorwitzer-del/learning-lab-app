@@ -5,6 +5,7 @@ from utils.learning import run_es_vix_engine
 from utils.alpha_live import live_divergence_signal
 from utils.alpha_history import fetch_history
 
+
 st.set_page_config(page_title="Learning Lab", layout="wide")
 
 st.title("📈 Learning Lab — ES+VIX Divergence Engine")

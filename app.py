@@ -116,6 +116,8 @@ bot = st.session_state.bot
 enable_bot = st.checkbox("Enable automated trading (simulation mode)")
 
 broker = st.selectbox(
+    bot.set_broker(broker)
+
     "Select broker (architecture only at this stage)",
     ["Interactive Brokers (IBKR)", "Alpaca", "None"]
 )

@@ -86,22 +86,20 @@ if st.button("Run Backtest", key="bt_run"):
                 st.error(f"Missing expected columns after renaming: {missing}")
                 st.stop()
 
-            # Divergence logic
-            df["ES_move"] = df["Close_SPY"] - df["Open_SPY"]
-            df["VIX_move"] = df["Close_VIX"] - df["Open_VIX"]
+            # Divergence logic with aggressive thresholds (0.05%)
+df["ES_pct"] = (df["Close_SPY"] - df["Open_SPY"]) / df["Open_SPY"]
+df["VIX_pct"] = (df["Close_VIX"] - df["Open_VIX"]) / df["Open_VIX"]
 
-            df["ES_dir"] = np.where(df["ES_move"] > 0, 1,
-                             np.where(df["ES_move"] < 0, -1, 0))
-            df["VIX_dir"] = np.where(df["VIX_move"] > 0, 1,
-                              np.where(df["VIX_move"] < 0, -1, 0))
+threshold = 0.0005  # 0.05%
 
-            df["Signal"] = np.where(
-                (df["ES_dir"] == 1) & (df["VIX_dir"] == -1), "LONG",
-                np.where(
-                    (df["ES_dir"] == -1) & (df["VIX_dir"] == 1), "SHORT",
-                    "NONE"
-                )
-            )
+df["Signal"] = np.where(
+    (df["ES_pct"] > threshold) & (df["VIX_pct"] < -threshold), "LONG",
+    np.where(
+        (df["ES_pct"] < -threshold) & (df["VIX_pct"] > threshold), "SHORT",
+        "NONE"
+    )
+)
+
 
             # Trade simulation
             trades = []

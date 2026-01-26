@@ -11,61 +11,23 @@ st.title("📈 Learning Lab — ES+VIX Divergence Engine")
 # ---------------------------------------------------------
 # CREATE ALL THREE TABS
 # ---------------------------------------------------------
-tab1, tab2, tab3 = st.tabs(
-    [
-        "Backtest (CSV)",
-        "Live Signals (Alpha Vantage)",
-        "Historical Auto‑Fetch"
+tab1, tab2 = st.tabs([
+    "Live Signals",
+    "Historical Auto‑Fetch"
+])
+
     ]
 )
 # ---------------------------------------------------------
 # TAB 1 — CSV BACKTEST
 # ---------------------------------------------------------
-with tab1:
-    st.subheader("Backtest with ES & VIX CSVs")
 
-    es_file = st.file_uploader("Upload ES CSV", type="csv", key="es_csv")
-    vix_file = st.file_uploader("Upload VIX CSV", type="csv", key="vix_csv")
-
-    if es_file and vix_file:
-        es_df = pd.read_csv(es_file, parse_dates=["Date"])
-        vix_df = pd.read_csv(vix_file, parse_dates=["Date"])
-
-        monthly, stats, full_data = run_es_vix_engine(es_df, vix_df)
-
-        st.markdown("### 📅 Monthly P&L Summary")
-        st.dataframe(monthly)
-
-        st.markdown("### 📊 Stats")
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Trades", stats["Trades"])
-        col2.metric("Wins", stats["Wins"])
-        col3.metric("Losses", stats["Losses"])
-        col4.metric("Win Rate (%)", stats["Win Rate (%)"])
-
-        st.markdown("### 📝 Trade Log")
-        st.dataframe(
-            full_data[
-                [
-                    "Date",
-                    "signal",
-                    "ES_move",
-                    "VIX_move",
-                    "ATR14",
-                    "vix_regime",
-                    "size_mult",
-                    "PnL_MES",
-                ]
-            ]
-        )
-    else:
-        st.info("Upload both ES and VIX CSV files to run the backtest.")
 
 
 # ---------------------------------------------------------
 # TAB 2 — LIVE SIGNALS
 # ---------------------------------------------------------
-with tab2:
+with tab1:
     st.subheader("Live ES/VIX Divergence Signal (via Alpha Vantage)")
 
     st.caption("Uses SPY as ES proxy and VIX from Alpha Vantage. Refresh to update.")
@@ -97,7 +59,7 @@ with tab2:
 # ---------------------------------------------------------
 # TAB 3 — HISTORICAL AUTO‑FETCH
 # ---------------------------------------------------------
-with tab3:
+with tab2:
     st.subheader("Automated Historical Backtest (No Uploads)")
 
     start = st.date_input("Start date")

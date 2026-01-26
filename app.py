@@ -1,3 +1,5 @@
+st.write("DEBUG: app.py loaded", key="debug_marker_1")
+
 from utils.alpha_live import live_divergence_signal
 import streamlit as st
 from utils.alpha_live import live_divergence_signal
@@ -155,5 +157,6 @@ if st.button("Run Backtest"):
             st.subheader("⬇️ Download Results")
             csv = trades_df.to_csv(index=False)
             st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
+st.write("DEBUG: end of app.py", key="debug_marker_2")
 
 

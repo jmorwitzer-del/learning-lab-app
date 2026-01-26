@@ -60,3 +60,4 @@ def fetch_daily(symbol, start, end):
         "v": "Volume"
     })
     return df.sort_values("Date")
+

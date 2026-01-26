@@ -66,3 +66,12 @@ class BotEngine:
             "last_trade": self.last_trade,
             "log": self.log[-10:],  # last 10 entries
         }
+    def execute_order(self, side, symbol="SPY", quantity=1):
+        """Simulate sending an order to the selected broker."""
+        if self.broker is None:
+            return "No broker selected."
+
+        if not self.broker.connected:
+            self.broker.connect()
+
+        return self.broker.place_order(symbol, side, quantity)

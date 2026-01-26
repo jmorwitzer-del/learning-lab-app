@@ -1,8 +1,7 @@
-utils/brokers/alpaca.py
 class AlpacaBroker:
     """
     Placeholder Alpaca broker connector.
-    Real API calls will be added in Stage 5.
+    Replace internals with real API calls only after thorough testing.
     """
 
     def __init__(self):

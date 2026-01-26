@@ -4,9 +4,8 @@ import numpy as np
 
 from utils.alpha_live import live_divergence_signal
 from utils.alpha_history import fetch_history
-from utils.yahoo_data import fetch_intraday   # 
-
-
+from utils.yahoo_data import fetch_intraday
+from utils.bot_engine import BotEngine
 
 # ---------------------------------------------------------
 # LIVE SIGNAL SECTION (SPY + ^VIX via Yahoo)
@@ -19,7 +18,7 @@ live = live_divergence_signal()
 if live is None:
     st.info(
         "No intraday candles available right now. This usually happens when the US market is closed "
-        "or Yahoo Finance hasn't published the latest minute bars yet."
+        "or data hasn't published the latest minute bars yet."
     )
 else:
     st.success(f"Signal: {live['signal']}")
@@ -27,6 +26,7 @@ else:
     st.write(f"VIX move: {live['vix_move']:.2f}")
     st.write(f"SPY close: {live['spy_close']:.2f}")
     st.write(f"VIX close: {live['vix_close']:.2f}")
+
 # ---------------------------------------------------------
 # LIVE MARKET DASHBOARD (Stage 3)
 # ---------------------------------------------------------
@@ -99,13 +99,19 @@ else:
 
     st.info(f"VIX Level: **{vix_level:.2f}** → {sentiment}")
 
-## ---------------------------------------------------------
+# ---------------------------------------------------------
 # AUTOMATION SECTION (Stage 4)
 # ---------------------------------------------------------
 
 st.header("🤖 Automated Trading Bot")
 
-st.info("This section prepares the bot architecture. No trades will be executed yet.")
+st.info("This section runs the bot in simulation mode. No real trades are executed.")
+
+# Keep a single BotEngine instance in session state
+if "bot" not in st.session_state:
+    st.session_state.bot = BotEngine()
+
+bot = st.session_state.bot
 
 enable_bot = st.checkbox("Enable automated trading (simulation mode)")
 
@@ -129,14 +135,45 @@ if live:
 else:
     st.write("Waiting for live data…")
 
-# Placeholder for next scheduled trade
-st.write("### 📅 Next Scheduled Action")
-st.info("Bot will check for signals at market open and close (architecture only).")
+st.write("---")
 
-# Placeholder for last executed trade
+# Manual simulation controls (stand-in for scheduled open/close checks)
+col_a, col_b = st.columns(2)
+
+with col_a:
+    if st.button("Simulate Market OPEN Check"):
+        if enable_bot and live:
+            if bot.should_enter(live["signal"]):
+                bot.enter_trade(live["signal"])
+
+with col_b:
+    if st.button("Simulate Market CLOSE Check"):
+        if enable_bot:
+            if bot.should_exit():
+                bot.exit_trade()
+
+# Bot status
+status = bot.get_status()
+
+st.write("### 📌 Bot Status")
+if status["position"]:
+    st.write(f"Current position: **{status['position']}**")
+else:
+    st.write("No open position.")
+
 st.write("### 📜 Last Executed Trade")
-st.info("No trades executed yet (simulation mode).")
- ---------------------------------------------------------
+if status["last_trade"]:
+    st.info(status["last_trade"])
+else:
+    st.info("No trades executed yet (simulation mode).")
+
+st.write("### 🧾 Recent Bot Log")
+if status["log"]:
+    for line in status["log"]:
+        st.write(f"- {line}")
+else:
+    st.write("Log is empty.")
+
 # ---------------------------------------------------------
 # BACKTEST SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------
@@ -295,6 +332,7 @@ if st.button("Run Backtest", key="bt_run"):
             st.subheader("⬇️ Download Results")
             csv = trades_df.to_csv(index=False)
             st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
+
 
 
 

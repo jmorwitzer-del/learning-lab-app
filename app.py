@@ -24,8 +24,6 @@ else:
     st.write(f"VIX move: {live['vix_move']:.2f}")
     st.write(f"SPY close: {live['spy_close']:.2f}")
     st.write(f"VIX close: {live['vix_close']:.2f}")
-
-# ---------------------------------------------------------
 # ---------------------------------------------------------
 # BACKTEST SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------
@@ -53,24 +51,41 @@ if st.button("Run Backtest", key="bt_run"):
             df = pd.merge(spy, vix, on="Date", suffixes=("_SPY", "_VIX"))
             df = df.sort_values("Date").reset_index(drop=True)
 
-            # Flatten MultiIndex columns from Yahoo Finance
+            # Flatten MultiIndex columns
             df.columns = [
                 f"{col[0]}{col[1]}" if isinstance(col, tuple) else col
                 for col in df.columns
             ]
 
-            # DEBUG: Show actual columns so we know what Yahoo returned
+            # DEBUG: Show columns
             st.write("🔍 Columns returned by Yahoo Finance:", list(df.columns))
 
-            # Ensure expected columns exist
+            # FIX: Rename Yahoo’s weird suffixes to expected names
+            rename_map = {
+                "OpenSPY": "Open_SPY",
+                "CloseSPY": "Close_SPY",
+                "HighSPY": "High_SPY",
+                "LowSPY": "Low_SPY",
+                "VolumeSPY": "Volume_SPY",
+
+                "Open^VIX": "Open_VIX",
+                "Close^VIX": "Close_VIX",
+                "High^VIX": "High_VIX",
+                "Low^VIX": "Low_VIX",
+                "Volume^VIX": "Volume_VIX",
+            }
+
+            df = df.rename(columns=rename_map)
+
+            # Validate required columns
             required_cols = ["Open_SPY", "Close_SPY", "Open_VIX", "Close_VIX"]
             missing = [c for c in required_cols if c not in df.columns]
 
             if missing:
-                st.error(f"Missing expected columns: {missing}")
+                st.error(f"Missing expected columns after renaming: {missing}")
                 st.stop()
 
-            # Divergence logic on daily bars
+            # Divergence logic
             df["ES_move"] = df["Close_SPY"] - df["Open_SPY"]
             df["VIX_move"] = df["Close_VIX"] - df["Open_VIX"]
 
@@ -128,7 +143,4 @@ if st.button("Run Backtest", key="bt_run"):
             csv = trades_df.to_csv(index=False)
             st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
 
-            # CSV Export
-            st.subheader("⬇️ Download Results")
-            csv = trades_df.to_csv(index=False)
-            st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
+

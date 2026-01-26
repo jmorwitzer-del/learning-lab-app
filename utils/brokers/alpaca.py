@@ -1,7 +1,8 @@
 class AlpacaBroker:
     """
     Placeholder Alpaca broker connector.
-    Replace internals with real API calls only after thorough testing.
+    Replace internals with real API calls only after thorough testing
+    and with full awareness of the risks of automated trading.
     """
 
     def __init__(self):

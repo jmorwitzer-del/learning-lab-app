@@ -8,3 +8,4 @@ def fetch_history(start, end):
         return None, None
 
     return spy, vix
+

@@ -23,7 +23,8 @@ end_date = st.date_input("End date", key="backtest_end")
 
 
 
-if st.button("Run Backtest"):
+if st.button("Run Backtest", key="run_backtest_button"):
+
     if start_date >= end_date:
         st.error("End date must be after start date.")
     else:

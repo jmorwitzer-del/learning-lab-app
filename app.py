@@ -7,10 +7,14 @@ st.set_page_config(page_title="Learning Lab", layout="wide")
 
 st.title("📈 Learning Lab — ES+VIX Divergence Engine")
 
-tab1, tab2 = st.tabs(["Backtest (CSV)", "Live Signals (Alpha Vantage)"])
-
+tab1, tab2, tab3 = st.tabs([
+    "Backtest (CSV)",
+    "Live Signals (Alpha Vantage)",
+    "Historical Auto‑Fetch"
+])
+with tab1: # backtest code... with tab2: # live signals code... with tab3: # historical auto-fetch code...
 # -----------------------------
-# TAB 1: BACKTEST (CSV UPLOAD)
+# TAB 1: BACKTEST (CSV UPLOAD) 
 # -----------------------------
 with tab1:
     st.subheader("Backtest with ES & VIX CSVs")

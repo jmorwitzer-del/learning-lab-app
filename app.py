@@ -99,7 +99,44 @@ else:
 
     st.info(f"VIX Level: **{vix_level:.2f}** → {sentiment}")
 
+## ---------------------------------------------------------
+# AUTOMATION SECTION (Stage 4)
 # ---------------------------------------------------------
+
+st.header("🤖 Automated Trading Bot")
+
+st.info("This section prepares the bot architecture. No trades will be executed yet.")
+
+enable_bot = st.checkbox("Enable automated trading (simulation mode)")
+
+broker = st.selectbox(
+    "Select broker (architecture only at this stage)",
+    ["Interactive Brokers (IBKR)", "Alpaca", "None"]
+)
+
+if enable_bot:
+    st.success("Automation enabled (simulation mode).")
+else:
+    st.warning("Automation disabled.")
+
+# Show current live signal feeding the bot
+live = live_divergence_signal()
+if live:
+    st.write("### 🔌 Live Signal Feed")
+    st.write(f"Signal: **{live['signal']}**")
+    st.write(f"SPY move: {live['es_move']:.4f}")
+    st.write(f"VIX move: {live['vix_move']:.4f}")
+else:
+    st.write("Waiting for live data…")
+
+# Placeholder for next scheduled trade
+st.write("### 📅 Next Scheduled Action")
+st.info("Bot will check for signals at market open and close (architecture only).")
+
+# Placeholder for last executed trade
+st.write("### 📜 Last Executed Trade")
+st.info("No trades executed yet (simulation mode).")
+ ---------------------------------------------------------
 # ---------------------------------------------------------
 # BACKTEST SECTION (SPY + ^VIX via Yahoo)
 # ---------------------------------------------------------

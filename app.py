@@ -12,6 +12,37 @@ tab1, tab2, tab3 = st.tabs([
     "Live Signals (Alpha Vantage)",
     "Historical Auto‑Fetch"
 ])
+# ---------------------------------------------------------
+# CREATE ALL THREE TABS HERE — BEFORE USING tab1/tab2/tab3
+# ---------------------------------------------------------
+tab1, tab2, tab3 = st.tabs([
+    "Backtest (CSV)",
+    "Live Signals (Alpha Vantage)",
+    "Historical Auto‑Fetch"
+])
+
+# ---------------------------------------------------------
+# TAB 1
+# ---------------------------------------------------------
+with tab1:
+    st.subheader("Backtest with ES & VIX CSVs")
+    # ... your CSV code ...
+
+# ---------------------------------------------------------
+# TAB 2
+# ---------------------------------------------------------
+with tab2:
+    st.subheader("Live ES/VIX Divergence Signal (via Alpha Vantage)")
+    # ... your live signal code ...
+
+# ---------------------------------------------------------
+# TAB 3
+# ---------------------------------------------------------
+with tab3:
+    st.subheader("Automated Historical Backtest (No Uploads)")
+    # ... your historical fetch code ...
+
+])
 with tab1: # backtest code... with tab2: # live signals code... with tab3: # historical auto-fetch code...
 # -----------------------------
 # TAB 1: BACKTEST (CSV UPLOAD) 

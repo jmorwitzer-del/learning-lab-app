@@ -6,6 +6,7 @@ from utils.alpha_live import live_divergence_signal
 from utils.alpha_history import fetch_history
 from utils.yahoo_data import fetch_intraday
 from utils.bot_engine import BotEngine
+from modules.es_vix_engine import calculate_signal
 
 # ---------------------------------------------------------
 # LIVE SIGNAL SECTION (SPY + ^VIX via Yahoo)
@@ -334,5 +335,15 @@ if st.button("Run Backtest", key="bt_run"):
             st.subheader("⬇️ Download Results")
             csv = trades_df.to_csv(index=False)
             st.download_button("Download CSV", csv, "backtest_results.csv", "text/csv")
+            st.subheader("ES + VIX Signal")
+
+result = calculate_signal(spy_open, spy_now, vix_open, vix_now)
+
+st.write(f"Signal: {result['signal']}")
+st.write(f"Confidence: {result['confidence']} / 5")
+st.write(f"SPY Change: {result['spy_change']}%")
+st.write(f"VIX Change: {result['vix_change']}%")
+st.write(f"Reason: {result['reason']}")
+
 
 
